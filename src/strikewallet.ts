@@ -60,7 +60,7 @@ export interface SignerOptions {
     signers?: Signer[];
 }
 
-export default class StrikeWallet {
+export class StrikeWallet {
     isLoggedIn: boolean;
     url = 'https://wallet.strikeprotocols.com';
     private _pendingTransactions: PendingTransactions;
