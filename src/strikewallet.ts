@@ -40,12 +40,16 @@ interface StrikeWalletMessage {
     signTransaction?: SignTransaction;
 }
 
+interface TransactionError {
+    message: string
+}
+
 interface PendingTransactions {
     [hash: string]: SendTransaction | SignTransaction | null
 }
 
 interface PendingTransactionErrors {
-    [hash: string]: Error | null
+    [hash: string]: TransactionError | null
 }
 
 interface SerializableInstruction {
@@ -292,7 +296,7 @@ export class StrikeWallet {
             const transactionIdentifier = data.sendTransaction?.identifier
             if (transactionIdentifier && transactionIdentifier in this._pendingTransactions) {
                 if (data.error) {
-                    this._pendingTransactionErrors[transactionIdentifier] = new Error(data.error);
+                    this._pendingTransactionErrors[transactionIdentifier] = {message: data.error};
                 } else {
                     this._pendingTransactions[transactionIdentifier] = data.sendTransaction || null
                 }
@@ -301,7 +305,7 @@ export class StrikeWallet {
             const transactionIdentifier = data.signTransaction?.identifier
             if (transactionIdentifier && transactionIdentifier in this._pendingTransactions) {
                 if (data.error) {
-                    this._pendingTransactionErrors[transactionIdentifier] = new Error(data.error);
+                    this._pendingTransactionErrors[transactionIdentifier] = {message: data.error}
                 } else {
                     this._pendingTransactions[transactionIdentifier] = data.signTransaction || null
                 }
