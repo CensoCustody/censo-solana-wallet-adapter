@@ -144,9 +144,7 @@ export class StrikeWallet {
     public async signAllTransactions(transactions: Transaction[]): Promise<Transaction[]> {
         this.verifyCanSignRequests(transactions)
         try {
-            return Promise.all(transactions.map(transaction => {
-                return this.signOneTransaction(transaction);
-            }))
+            return this.signMultipleTransactions(transactions);
         } catch (error: any) {
             throw error;
         }
@@ -277,6 +275,35 @@ export class StrikeWallet {
                     this.clearTimer(timer)
                     pendingTransaction && resolve(this.buildTransaction(pendingTransaction))
                     pendingTransactionError &&  reject(pendingTransactionError)
+                }
+            }, 100);
+            this._timers.push(timer)
+        });
+    }
+
+    private signMultipleTransactions(transactions: Transaction[]): Promise<Transaction[]> {
+        const wallet = this._wallet;
+        if (!wallet) throw new Error("Not Connected");
+
+        const serializedTransactions = transactions.map((t) => {
+            return {
+                instructions: this.instructionsToSerializableInstructions(t.instructions),
+                transactionIdentifier: uuidv4()
+            }
+        })
+        const transactionIdentifiers = serializedTransactions.map((t) => t.transactionIdentifier)
+        transactionIdentifiers.forEach((transactionIdentifier) => this._pendingTransactions[transactionIdentifier] = null)
+        return new Promise<Transaction[]>((resolve, reject) => {
+            wallet.postMessage({type: "signAllTransactions", signAllTransactions: {transactions: serializedTransactions}}, this.url);
+            const timer = window.setInterval(() => {
+                const pendingTransactions = transactionIdentifiers.map((txId) => this._pendingTransactions[txId] as SignTransaction)
+                const pendingTransactionErrors = transactionIdentifiers.map((txId) => this._pendingTransactionErrors[txId])
+                if (pendingTransactions.every((t) => t != null)) {
+                    this.clearTimer(timer)
+                    resolve(pendingTransactions.map((pt) => this.buildTransaction(pt)))
+                } else if (pendingTransactionErrors.some((e) => e != null)) {
+                    this.clearTimer(timer)
+                    reject(pendingTransactionErrors.find((e) => e != null))
                 }
             }, 100);
             this._timers.push(timer)
