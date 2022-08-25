@@ -61,8 +61,9 @@ the instructions from the multisig op and comparing them.
 For most dApps, the main impact of the finalization transaction overhead comes down to how many accounts the dApp
 transaction uses. The finalization transaction requires 3 additional accounts -- the strike wallet program, the
 multisig op account and the Strike fee payer, which, to fit in the 1232 bytes available for a transaction, limits the
-maximum number of accounts available to a dApp transaction to 30 when there is a single signer. Note that any
-instruction parameters are already persisted in the multisig op and are not needed in the finalization transaction.
+maximum number of accounts available to a dApp transaction to 31 (when there is a single signer and the dApp
+transaction uses the wallet account). Note that any instruction parameters are already persisted in the multisig op
+and are not needed in the finalization transaction.
 
 In terms of compute budget, the finalization overhead is fairly minimal, at about 21,500 compute units. The
 finalization transaction consumes one level of the allowed call depth of 4. Heap usage is harder to calculate, but
