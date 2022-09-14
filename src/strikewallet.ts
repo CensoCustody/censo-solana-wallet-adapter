@@ -76,6 +76,7 @@ export class StrikeWallet extends EventEmitter {
     private _publicKey: PublicKey | null;
 
     constructor() {
+        super()
         this.isLoggedIn = false
         this._pendingTransactions = {}
         this._pendingTransactionErrors = {}
