@@ -1,6 +1,6 @@
 {
     "name": "@strike-protocols/solana-wallet-adapter",
-    "version": "0.1.6",
+    "version": "0.1.7",
     "author": "Strike Developers <developers@strikeprotocols.com>",
     "repository": "https://github.com/StrikeProtocols/strike-solana-wallet-adapter",
     "license": "Apache-2.0",
