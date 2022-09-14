@@ -8,6 +8,7 @@ import {
 } from "@solana/web3.js";
 import bs58 from "bs58";
 import {v4 as uuidv4} from "uuid";
+import { EventEmitter } from "eventemitter3";
 
 
 interface Connected {
@@ -64,7 +65,7 @@ export interface SignerOptions {
     signers?: Signer[];
 }
 
-export class StrikeWallet {
+export class StrikeWallet extends EventEmitter {
     isLoggedIn: boolean;
     url = 'https://wallet.strikeprotocols.com';
     private _pendingTransactions: PendingTransactions;
@@ -94,7 +95,7 @@ export class StrikeWallet {
             const origin = encodeURIComponent(window.location.origin);
             const connectUrl = `${this.url}/connect?origin=${origin}`;
             this._connecting = true
-            this._wallet = window.open(connectUrl, `strike-wallet-${origin}`, "height=800,width=800,menubar=no,status=no,toolbar=no");
+            this._wallet = window.open(connectUrl, `strike-wallet-${origin}`, "height=900,width=800,menubar=no,status=no,toolbar=no");
             if (!this._wallet) {
                 this._connecting = false
                 throw new Error("Unable to connect to wallet")
@@ -130,6 +131,7 @@ export class StrikeWallet {
             wallet.close()
         }
         this._wallet = null
+        this.emit('disconnected')
     }
 
     public async signTransaction(transaction: Transaction): Promise<Transaction> {
