@@ -1,1 +1,1 @@
-export * from './strikewallet';
+export * from './strikewallet.js';
